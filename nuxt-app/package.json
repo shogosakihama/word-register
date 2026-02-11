@@ -1,0 +1,23 @@
+{
+  "name": "nuxt-word-app",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.11.3",
+    "nuxt": "^3.9.0",
+    "pinia": "^2.1.0",
+    "vue": "^3.3.0"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@types/chrome": "^0.1.36"
+  }
+}

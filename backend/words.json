@@ -1,0 +1,14 @@
+[
+  {
+    "id": 2,
+    "text": "プライド",
+    "pageUrl": "https://www.youtube.com/watch?v=SJzf2ppy7Yg&list=RDSJzf2ppy7Yg&start_radio=1",
+    "createdAt": "2026-02-09T14:07:26.784Z"
+  },
+  {
+    "id": 1,
+    "text": "HTML",
+    "pageUrl": "https://ja.vuejs.org/guide/essentials/template-syntax",
+    "createdAt": "2026-02-09T14:01:53.469Z"
+  }
+]

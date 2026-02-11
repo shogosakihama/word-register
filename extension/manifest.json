@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Word Registrator",
+  "version": "1.0.0",
+  "description": "Webページから単語を選択して、Nuxtアプリに登録する拡張機能",
+
+  "permissions": [
+    "contextMenus",
+    "scripting",
+    "activeTab",
+    "storage"
+  ],
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+
+  "action": {
+    "default_title": "Word Registrator"
+  }
+}
