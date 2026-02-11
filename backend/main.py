@@ -2,6 +2,7 @@
 FastAPI バックエンド - 単語登録API
 """
 from datetime import datetime
+import os
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -20,17 +21,19 @@ app = FastAPI(
 )
 
 # CORS設定（Nuxtアプリからのアクセスを許可）
+allowed = os.getenv("ALLOWED_ORIGINS")
+if allowed:
+    # カンマ区切りで渡す (例: https://app.vercel.app,http://localhost:3000)
+    allow_origins = [a.strip() for a in allowed.split(",") if a.strip()]
+else:
+    allow_origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "http://localhost:3003",
-        "http://localhost:3004",
-        "http://localhost:3005",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
