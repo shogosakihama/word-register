@@ -2,8 +2,6 @@ import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import type { Word } from '../types/word'
 
-const API_BASE_URL = 'http://localhost:8000'
-
 /**
  * Pinia ストア: 単語管理
  * 
@@ -15,6 +13,9 @@ const API_BASE_URL = 'http://localhost:8000'
  * - fetchWords: 単語一覧取得 → GET /api/words
  */
 export const useWordsStore = defineStore('words', () => {
+  const config = useRuntimeConfig()
+  const API_BASE_URL = config.public.apiBaseUrl as string
+  
   // ===== STATE =====
   const words = ref<Word[]>([])
   const loading = ref(false)
