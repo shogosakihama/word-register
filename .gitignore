@@ -1,3 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+dist/
+
+# Environment files
+.env
+.env.*
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+*.dockerignore
 # Node.js
 node_modules/
 .nuxt/
