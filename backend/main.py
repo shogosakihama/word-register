@@ -3,6 +3,8 @@ FastAPI バックエンド - 単語登録API
 """
 from datetime import datetime
 import os
+import logging
+import sys
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -12,6 +14,10 @@ import httpx
 from database import engine, get_db, Base, SessionLocal
 from models import Word
 from schemas import WordCreate, WordResponse, WordListResponse
+
+# Configure logging to stdout so platform log collectors capture it
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger(__name__)
 
 # テーブル作成 (既存テーブルがある場合はALTERでカラムを追加)
 Base.metadata.create_all(bind=engine)
@@ -73,6 +79,8 @@ def get_words(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
         words=[WordResponse(
             id=w.id,
             text=w.text,
+            pronunciation=w.pronunciation,
+            definition=w.definition,
             pageUrl=w.page_url,
             createdAt=w.created_at,
         ) for w in words],
@@ -85,7 +93,7 @@ def create_word(word: WordCreate, background_tasks: BackgroundTasks, db: Session
     """
     単語を登録
     """
-    print(f"[API] Creating word: {word.text}")
+    logger.info("[API] Creating word: %s", word.text)
     
     # createdAt を解析
     created_at = None
@@ -103,13 +111,13 @@ def create_word(word: WordCreate, background_tasks: BackgroundTasks, db: Session
         created_at=created_at,
     )
     db.add(db_word)
-    print(f"[API] Added word to session: {db_word.text}")
+    logger.info("[API] Added word to session: %s", db_word.text)
     
     db.commit()
-    print(f"[API] Committed transaction")
+    logger.info("[API] Committed transaction")
     
     db.refresh(db_word)
-    print(f"[API] Refreshed word with ID: {db_word.id}")
+    logger.info("[API] Refreshed word with ID: %s", db_word.id)
 
     # Schedule background fetch for pronunciation/definition
     background_tasks.add_task(fetch_dictionary_info_and_update, db_word.id, db_word.text)
@@ -151,13 +159,18 @@ def delete_all_words(db: Session = Depends(get_db)):
 def fetch_dictionary_info_and_update(word_id: int, text: str):
     """Fetch pronunciation and definition from dictionaryapi.dev and update DB."""
     try:
+        logger.info("[BG] Fetching dictionary info for '%s' (id=%s)", text, word_id)
         url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{text}"
+        logger.info("[BG] URL: %s", url)
         with httpx.Client(timeout=10.0) as client:
             r = client.get(url)
+            logger.info("[BG] Dictionary API status: %s", r.status_code)
             if r.status_code != 200:
+                logger.info("[BG] Non-200 response for '%s': %s", text, r.status_code)
                 return
             data = r.json()
             if not data or not isinstance(data, list):
+                logger.info("[BG] Unexpected data format for '%s': %s", text, type(data))
                 return
             entry = data[0]
             # phonetic
@@ -178,11 +191,14 @@ def fetch_dictionary_info_and_update(word_id: int, text: str):
                         definition = d
                         break
 
+            logger.info("[BG] Found pronunciation=%r definition=%r", pron, (definition[:120] + '...') if definition and len(definition) > 120 else definition)
+
             # update DB
             session = Session(bind=engine)
             try:
                 obj = session.query(Word).filter(Word.id == word_id).first()
                 if not obj:
+                    logger.warning("[BG] Word id=%s not found in DB", word_id)
                     return
                 if pron:
                     obj.pronunciation = pron
@@ -190,8 +206,9 @@ def fetch_dictionary_info_and_update(word_id: int, text: str):
                     obj.definition = definition
                 session.add(obj)
                 session.commit()
+                logger.info("[BG] Updated word id=%s in DB", word_id)
             finally:
                 session.close()
-    except Exception:
-        # ignore errors silently
+    except Exception as e:
+        logger.exception("[BG] Exception while fetching/updating word id=%s: %s", word_id, e)
         return
