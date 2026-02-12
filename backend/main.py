@@ -156,6 +156,27 @@ def delete_all_words(db: Session = Depends(get_db)):
     return None
 
 
+@app.post("/api/words/{word_id}/fetch", status_code=200)
+def fetch_word_now(word_id: int, db: Session = Depends(get_db)):
+    """Debug endpoint: immediately fetch dictionary info for a word (synchronous)."""
+    w = db.query(Word).filter(Word.id == word_id).first()
+    if not w:
+        raise HTTPException(status_code=404, detail="Word not found")
+    logger.info("[DBG] Manual fetch invoked for id=%s text=%s", word_id, w.text)
+    # Call the same function used by the background task synchronously
+    fetch_dictionary_info_and_update(word_id, w.text)
+    # Return fresh record
+    db.refresh(w)
+    return WordResponse(
+        id=w.id,
+        text=w.text,
+        pronunciation=w.pronunciation,
+        definition=w.definition,
+        pageUrl=w.page_url,
+        createdAt=w.created_at,
+    )
+
+
 def fetch_dictionary_info_and_update(word_id: int, text: str):
     """Fetch pronunciation and definition from dictionaryapi.dev and update DB."""
     try:
