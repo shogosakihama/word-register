@@ -15,12 +15,16 @@ class Word(Base):
     id = Column(Integer, primary_key=True, index=True)
     text = Column(String(500), nullable=False, index=True)
     page_url = Column(Text, nullable=True)
+    pronunciation = Column(Text, nullable=True)
+    definition = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     def to_dict(self):
         return {
             "id": self.id,
             "text": self.text,
+            "pronunciation": self.pronunciation,
+            "definition": self.definition,
             "pageUrl": self.page_url,
             "createdAt": self.created_at.isoformat() if self.created_at else None,
         }

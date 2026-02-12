@@ -39,6 +39,8 @@ export const useWordsStore = defineStore('words', () => {
       words.value = data.words.map((w: any) => ({
         id: w.id,
         text: w.text,
+        pronunciation: w.pronunciation,
+        definition: w.definition,
         pageUrl: w.pageUrl,
         createdAt: w.createdAt,
       }))
@@ -69,6 +71,8 @@ export const useWordsStore = defineStore('words', () => {
       words.value.unshift({
         id: savedWord.id,
         text: savedWord.text,
+        pronunciation: savedWord.pronunciation,
+        definition: savedWord.definition,
         pageUrl: savedWord.pageUrl,
         createdAt: savedWord.createdAt,
       })

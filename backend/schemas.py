@@ -11,12 +11,17 @@ class WordCreate(BaseModel):
     text: str
     pageUrl: Optional[str] = None
     createdAt: Optional[str] = None
+    # pronunciation/definition are optional and normally filled by backend
+    pronunciation: Optional[str] = None
+    definition: Optional[str] = None
 
 
 class WordResponse(BaseModel):
     """単語レスポンス"""
     id: int
     text: str
+    pronunciation: Optional[str] = None
+    definition: Optional[str] = None
     pageUrl: Optional[str] = None
     createdAt: Optional[datetime] = None
 
