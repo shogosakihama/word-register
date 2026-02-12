@@ -31,8 +31,14 @@
           class="word-item"
         >
           <div class="word-content">
-            <span class="word-text">{{ word.text }}</span>
-            <span class="word-time">{{ formatTime(word.createdAt) }}</span>
+            <div class="word-main">
+              <span class="word-text">{{ word.text }}</span>
+              <span class="word-time">{{ formatTime(word.createdAt) }}</span>
+            </div>
+            <div class="word-meta">
+              <span v-if="word.pronunciation" class="word-pronunciation">{{ word.pronunciation }}</span>
+              <p v-if="word.definition" class="word-definition">{{ word.definition }}</p>
+            </div>
           </div>
           <button
             class="btn-delete"
@@ -189,6 +195,30 @@ function testAddWord() {
   font-size: 12px;
   color: #6c757d;
   white-space: nowrap;
+}
+
+.word-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.word-meta {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.word-pronunciation {
+  font-size: 13px;
+  color: #495057;
+  margin-right: 8px;
+}
+
+.word-definition {
+  margin: 6px 0 0 0;
+  font-size: 13px;
+  color: #212529;
 }
 
 .btn-delete {
