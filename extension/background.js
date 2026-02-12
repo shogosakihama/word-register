@@ -66,9 +66,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 
   // Background から直接APIに送信（Service WorkerはCORS制約なし）
+  // 本番: https://word-register-production.up.railway.app
+  const API_URL = 'https://word-register-production.up.railway.app/api/words'
   try {
     console.log('[Background] Saving word to API:', word)
-    const apiResponse = await fetch('http://localhost:8000/api/words', {
+    const apiResponse = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(word),
