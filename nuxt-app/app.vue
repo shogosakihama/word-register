@@ -30,14 +30,16 @@
           :key="word.id || `${word.createdAt}-${index}`"
           class="word-item"
         >
-          <div class="word-content">
-            <div class="word-main">
-              <span class="word-text">{{ word.text }}</span>
-              <span class="word-time">{{ formatTime(word.createdAt) }}</span>
+          <div class="word-grid">
+            <div class="col col-text">
+              <div class="word-text">{{ word.text }}</div>
+              <div class="word-time">{{ formatTime(word.createdAt) }}</div>
             </div>
-            <div class="word-meta">
-              <span v-if="word.pronunciation" class="word-pronunciation">{{ word.pronunciation }}</span>
-              <p v-if="word.definition" class="word-definition">{{ word.definition }}</p>
+            <div class="col col-pron">
+              <div v-if="word.pronunciation" class="word-pronunciation">{{ word.pronunciation }}</div>
+            </div>
+            <div class="col col-def">
+              <div v-if="word.definition" class="word-definition">{{ word.definition }}</div>
             </div>
           </div>
           <button
@@ -219,6 +221,40 @@ function testAddWord() {
   margin: 6px 0 0 0;
   font-size: 13px;
   color: #212529;
+}
+
+/* New layout: three columns */
+.word-grid {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+}
+.col-text {
+  flex-basis: 35%;
+  min-width: 120px;
+}
+.col-pron {
+  flex-basis: 20%;
+  min-width: 80px;
+}
+.col-def {
+  flex-basis: 45%;
+}
+
+.word-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #212529;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.word-definition {
+  white-space: normal;
 }
 
 .btn-delete {
