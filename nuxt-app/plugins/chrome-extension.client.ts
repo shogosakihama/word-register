@@ -12,7 +12,6 @@ declare global {
   interface Window {
     $testExtensionMessage?: () => void
   }
-  function defineNuxtPlugin(callback: any): any
 }
 
 export default defineNuxtPlugin(() => {
