@@ -36,7 +36,10 @@
               <div class="word-time">{{ formatTime(word.createdAt) }}</div>
             </div>
             <div class="col col-pron">
-              <div v-if="word.pronunciation" class="word-pronunciation">{{ word.pronunciation }}</div>
+              <div v-if="word.pronunciation || word.audioUrl" class="word-pronunciation">
+                <span>{{ word.pronunciation }}</span>
+                <button class="btn-play" @click="playPronunciation(word)" title="再生">🔊</button>
+              </div>
             </div>
             <div class="col col-def">
               <div v-if="word.definition" class="word-definition">{{ word.definition }}</div>
@@ -73,6 +76,34 @@ import { onMounted } from 'vue'
 import { useWords } from './composables/useWords'
 
 const { words, loading, error, deleteWord, fetchWords } = useWords()
+
+/**
+ * 再生: `audioUrl` があればそれを再生し、なければ SpeechSynthesis を使う
+ */
+function playPronunciation(word: any) {
+  if (typeof window === 'undefined') return
+  try {
+    if (word.audioUrl) {
+      const a = new Audio(word.audioUrl)
+      a.play().catch(() => {
+        // フォールバックで TTS
+        speakWithTTS(word.text)
+      })
+      return
+    }
+    speakWithTTS(word.text)
+  } catch (e) {
+    console.error('Play error', e)
+  }
+}
+
+function speakWithTTS(text: string) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
+  const utter = new SpeechSynthesisUtterance(text)
+  utter.lang = 'en-US'
+  window.speechSynthesis.cancel()
+  window.speechSynthesis.speak(utter)
+}
 
 // 開発環境判定
 const isDev = process.dev
