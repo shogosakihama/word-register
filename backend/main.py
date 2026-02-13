@@ -26,12 +26,32 @@ Base.metadata.create_all(bind=engine)
 def ensure_columns():
     """Add new columns if they do not exist (Postgres)."""
     try:
+        # Use a dialect-aware approach: for SQLite, check PRAGMA table_info; for others try ALTER ... IF NOT EXISTS
         with engine.begin() as conn:
-            conn.execute(text("ALTER TABLE words ADD COLUMN IF NOT EXISTS pronunciation TEXT;"))
-            conn.execute(text("ALTER TABLE words ADD COLUMN IF NOT EXISTS definition TEXT;"))
-            conn.execute(text("ALTER TABLE words ADD COLUMN IF NOT EXISTS audio_url TEXT;"))
+            dialect = engine.dialect.name
+            if dialect == 'sqlite':
+                # get existing columns
+                res = conn.execute(text("PRAGMA table_info('words');")).fetchall()
+                cols = [row[1] for row in res]
+                if 'pronunciation' not in cols:
+                    conn.execute(text("ALTER TABLE words ADD COLUMN pronunciation TEXT;"))
+                if 'definition' not in cols:
+                    conn.execute(text("ALTER TABLE words ADD COLUMN definition TEXT;"))
+                if 'audio_url' not in cols:
+                    conn.execute(text("ALTER TABLE words ADD COLUMN audio_url TEXT;"))
+            else:
+                # For Postgres and others that support IF NOT EXISTS
+                try:
+                    conn.execute(text("ALTER TABLE words ADD COLUMN IF NOT EXISTS pronunciation TEXT;"))
+                    conn.execute(text("ALTER TABLE words ADD COLUMN IF NOT EXISTS definition TEXT;"))
+                    conn.execute(text("ALTER TABLE words ADD COLUMN IF NOT EXISTS audio_url TEXT;"))
+                except Exception:
+                    # fallback to individual ALTERs without IF NOT EXISTS
+                    conn.execute(text("ALTER TABLE words ADD COLUMN pronunciation TEXT;"))
+                    conn.execute(text("ALTER TABLE words ADD COLUMN definition TEXT;"))
+                    conn.execute(text("ALTER TABLE words ADD COLUMN audio_url TEXT;"))
     except Exception:
-        # Non-fatal; ignore if DB doesn't support ALTER IF NOT EXISTS
+        # Non-fatal; ignore if DB doesn't support ALTER or PRAGMA
         pass
 
 
