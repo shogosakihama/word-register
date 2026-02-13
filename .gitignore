@@ -18,6 +18,13 @@ dist/
 
 # Logs
 *.log
+*.err
+*.out
+
+# SQLite databases
+*.db
+*.db-shm
+*.db-wal
 
 # IDE
 .vscode/
