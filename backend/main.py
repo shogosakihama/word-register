@@ -29,6 +29,7 @@ def ensure_columns():
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE words ADD COLUMN IF NOT EXISTS pronunciation TEXT;"))
             conn.execute(text("ALTER TABLE words ADD COLUMN IF NOT EXISTS definition TEXT;"))
+            conn.execute(text("ALTER TABLE words ADD COLUMN IF NOT EXISTS audio_url TEXT;"))
     except Exception:
         # Non-fatal; ignore if DB doesn't support ALTER IF NOT EXISTS
         pass
@@ -81,6 +82,7 @@ def get_words(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
             text=w.text,
             pronunciation=w.pronunciation,
             definition=w.definition,
+            audioUrl=w.audio_url,
             pageUrl=w.page_url,
             createdAt=w.created_at,
         ) for w in words],
@@ -127,6 +129,7 @@ def create_word(word: WordCreate, background_tasks: BackgroundTasks, db: Session
         text=db_word.text,
         pronunciation=db_word.pronunciation,
         definition=db_word.definition,
+        audioUrl=db_word.audio_url,
         pageUrl=db_word.page_url,
         createdAt=db_word.created_at,
     )
@@ -196,10 +199,18 @@ def fetch_dictionary_info_and_update(word_id: int, text: str):
             entry = data[0]
             # phonetic
             pron = None
+            audio = None
             if "phonetics" in entry and entry["phonetics"]:
                 for p in entry["phonetics"]:
-                    if p and p.get("text"):
+                    if not p:
+                        continue
+                    # prefer phonetic text for display
+                    if not pron and p.get("text"):
                         pron = p.get("text")
+                    # prefer an audio url if present
+                    if not audio and p.get("audio"):
+                        audio = p.get("audio")
+                    if pron and audio:
                         break
             # definition
             definition = None
@@ -223,6 +234,8 @@ def fetch_dictionary_info_and_update(word_id: int, text: str):
                     return
                 if pron:
                     obj.pronunciation = pron
+                if audio:
+                    obj.audio_url = audio
                 if definition:
                     obj.definition = definition
                 session.add(obj)

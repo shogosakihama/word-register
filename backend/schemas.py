@@ -14,6 +14,7 @@ class WordCreate(BaseModel):
     # pronunciation/definition are optional and normally filled by backend
     pronunciation: Optional[str] = None
     definition: Optional[str] = None
+    audioUrl: Optional[str] = None
 
 
 class WordResponse(BaseModel):
@@ -23,6 +24,7 @@ class WordResponse(BaseModel):
     pronunciation: Optional[str] = None
     definition: Optional[str] = None
     pageUrl: Optional[str] = None
+    audioUrl: Optional[str] = None
     createdAt: Optional[datetime] = None
 
     class Config:

@@ -16,6 +16,7 @@ class Word(Base):
     text = Column(String(500), nullable=False, index=True)
     page_url = Column(Text, nullable=True)
     pronunciation = Column(Text, nullable=True)
+    audio_url = Column(Text, nullable=True)
     definition = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
@@ -25,6 +26,7 @@ class Word(Base):
             "text": self.text,
             "pronunciation": self.pronunciation,
             "definition": self.definition,
+            "audioUrl": self.audio_url,
             "pageUrl": self.page_url,
             "createdAt": self.created_at.isoformat() if self.created_at else None,
         }
