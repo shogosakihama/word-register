@@ -1,1 +1,13 @@
+# Nuxt
+.nuxt
+.output
+dist
+node_modules
+
+# Development
+.env
+.env.*
+!.env.example
+
+# Vercel
 .vercel
