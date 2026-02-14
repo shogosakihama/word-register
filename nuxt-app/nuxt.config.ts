@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      // Use a different key name to avoid Vercel's automatic NUXT_PUBLIC_* override
+      // Production API endpoint for Railway backend
       baseApiUrl: 'https://word-register-production.up.railway.app'
     }
   }
