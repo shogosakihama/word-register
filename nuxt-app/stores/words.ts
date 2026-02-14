@@ -13,8 +13,8 @@ import type { Word } from '../types/word'
  * - fetchWords: 単語一覧取得 → GET /api/words
  */
 export const useWordsStore = defineStore('words', () => {
-  const config = useRuntimeConfig()
-  const API_BASE_URL = config.public.baseApiUrl as string
+  // Hardcoded production URL to bypass Vercel environment variable issues
+  const API_BASE_URL = 'https://word-register-production.up.railway.app'
   
   // ===== STATE =====
   const words = ref<Word[]>([])

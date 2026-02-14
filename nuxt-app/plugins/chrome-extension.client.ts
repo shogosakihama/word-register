@@ -25,8 +25,8 @@ export default defineNuxtPlugin(() => {
 
   // Pinia ストアを取得
   const wordsStore = useWordsStore()
-  const config = useRuntimeConfig()
-  const API_BASE_URL = config.public.baseApiUrl as string
+  // Hardcoded production URL to bypass Vercel environment variable issues
+  const API_BASE_URL = 'https://word-register-production.up.railway.app'
 
   /**
    * 3秒ごとにAPIをポーリングしてUIを自動更新
