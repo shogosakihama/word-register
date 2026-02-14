@@ -1,11 +1,13 @@
 export default defineNuxtConfig({
+  compatibilityDate: '2026-02-14',
   modules: ['@pinia/nuxt'],
   alias: {
     '~': '.',
   },
-  // Explicitly disable runtime config to prevent environment variable injection
+  // Clean runtime config - no environment variable injection
   runtimeConfig: {
-    // Empty public runtime config
     public: {}
-  }
+  },
+  // Ensure no SSR issues
+  ssr: true
 })
