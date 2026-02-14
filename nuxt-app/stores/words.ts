@@ -14,7 +14,7 @@ import type { Word } from '../types/word'
  */
 export const useWordsStore = defineStore('words', () => {
   const config = useRuntimeConfig()
-  const API_BASE_URL = config.public.apiBaseUrl as string
+  const API_BASE_URL = config.public.baseApiUrl as string
   
   // ===== STATE =====
   const words = ref<Word[]>([])

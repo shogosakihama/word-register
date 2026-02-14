@@ -5,8 +5,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      // Force production URL regardless of environment variable to fix CORS issue
-      apiBaseUrl: 'https://word-register-production.up.railway.app'
+      // Use a different key name to avoid Vercel's automatic NUXT_PUBLIC_* override
+      baseApiUrl: 'https://word-register-production.up.railway.app'
     }
   }
 })

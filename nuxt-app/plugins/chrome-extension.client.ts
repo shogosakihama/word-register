@@ -26,7 +26,7 @@ export default defineNuxtPlugin(() => {
   // Pinia ストアを取得
   const wordsStore = useWordsStore()
   const config = useRuntimeConfig()
-  const API_BASE_URL = config.public.apiBaseUrl as string
+  const API_BASE_URL = config.public.baseApiUrl as string
 
   /**
    * 3秒ごとにAPIをポーリングしてUIを自動更新
