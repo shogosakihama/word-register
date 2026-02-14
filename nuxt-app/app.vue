@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <header class="app-header">
-      <h1>📚 登録単語一覧</h1>
+      <h1>📚 登録単語一覧 (v2.0)</h1>
       <p class="subtitle">Webで選択 → 右クリック → 「単語を登録」</p>
     </header>
 
