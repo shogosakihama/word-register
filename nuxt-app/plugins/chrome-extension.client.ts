@@ -6,8 +6,9 @@
  * - Content Script からのメッセージを受信
  */
 
+import type { NuxtPlugin } from '#app'
 import { useWordsStore } from '../stores/words'
-import { API_ENDPOINTS } from '~/config/constants'
+import { API_ENDPOINTS } from '../config/constants'
 
 declare global {
   interface Window {

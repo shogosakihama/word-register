@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import type { Word } from '../types/word'
-import { API_ENDPOINTS } from '~/config/constants'
+import { API_ENDPOINTS } from '../config/constants'
 
 /**
  * Pinia ストア: 単語管理

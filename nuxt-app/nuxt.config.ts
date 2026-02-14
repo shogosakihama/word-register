@@ -2,6 +2,10 @@ export default defineNuxtConfig({
   modules: ['@pinia/nuxt'],
   alias: {
     '~': '.',
+  },
+  // Explicitly disable runtime config to prevent environment variable injection
+  runtimeConfig: {
+    // Empty public runtime config
+    public: {}
   }
-  // Removed runtimeConfig to avoid Vercel environment variable conflicts
 })
