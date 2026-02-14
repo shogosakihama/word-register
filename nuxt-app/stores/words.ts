@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import type { Word } from '../types/word'
+import { API_ENDPOINTS } from '~/config/constants'
 
 /**
  * Pinia ストア: 単語管理
@@ -13,9 +14,6 @@ import type { Word } from '../types/word'
  * - fetchWords: 単語一覧取得 → GET /api/words
  */
 export const useWordsStore = defineStore('words', () => {
-  // Hardcoded production URL to bypass Vercel environment variable issues
-  const API_BASE_URL = 'https://word-register-production.up.railway.app'
-  
   // ===== STATE =====
   const words = ref<Word[]>([])
   const loading = ref(false)
@@ -33,7 +31,7 @@ export const useWordsStore = defineStore('words', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch(`${API_BASE_URL}/api/words`)
+      const response = await fetch(API_ENDPOINTS.words)
       if (!response.ok) throw new Error('Failed to fetch words')
       const data = await response.json()
       words.value = data.words.map((w: any) => ({
@@ -62,7 +60,7 @@ export const useWordsStore = defineStore('words', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch(`${API_BASE_URL}/api/words`, {
+      const response = await fetch(API_ENDPOINTS.words, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(word),
@@ -103,7 +101,7 @@ export const useWordsStore = defineStore('words', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch(`${API_BASE_URL}/api/words/${word.id}`, {
+      const response = await fetch(`${API_ENDPOINTS.words}/${word.id}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete word')
@@ -124,7 +122,7 @@ export const useWordsStore = defineStore('words', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch(`${API_BASE_URL}/api/words`, {
+      const response = await fetch(API_ENDPOINTS.words, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to clear words')

@@ -7,6 +7,7 @@
  */
 
 import { useWordsStore } from '../stores/words'
+import { API_ENDPOINTS } from '~/config/constants'
 
 declare global {
   interface Window {
@@ -25,8 +26,6 @@ export default defineNuxtPlugin(() => {
 
   // Pinia ストアを取得
   const wordsStore = useWordsStore()
-  // Hardcoded production URL to bypass Vercel environment variable issues
-  const API_BASE_URL = 'https://word-register-production.up.railway.app'
 
   /**
    * 3秒ごとにAPIをポーリングしてUIを自動更新
@@ -36,7 +35,7 @@ export default defineNuxtPlugin(() => {
   let lastWordCount = 0
   const pollInterval = setInterval(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/words`)
+      const response = await fetch(API_ENDPOINTS.words)
       if (!response.ok) return
       const data = await response.json()
       const newCount = data.total || 0
