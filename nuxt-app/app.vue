@@ -30,28 +30,50 @@
           :key="word.id || `${word.createdAt}-${index}`"
           class="word-item"
         >
-          <div class="word-grid">
-            <div class="col col-text">
-              <div class="word-text">{{ word.text }}</div>
-              <div class="word-time">{{ formatTime(word.createdAt) }}</div>
-            </div>
-            <div class="col col-pron">
-              <div v-if="word.pronunciation || word.audioUrl" class="word-pronunciation">
-                <span>{{ word.pronunciation }}</span>
-                <button class="btn-play" @click="playPronunciation(word)" title="再生">🔊</button>
+          <div class="word-item-main">
+            <div class="word-grid">
+              <div class="col col-text">
+                <div class="word-text" @click="toggleAffixAnalysis(word.id)">{{ word.text }}</div>
+                <div class="word-time">{{ formatTime(word.createdAt) }}</div>
+              </div>
+              <div class="col col-pron">
+                <div v-if="word.pronunciation || word.audioUrl" class="word-pronunciation">
+                  <span>{{ word.pronunciation }}</span>
+                  <button class="btn-play" @click="playPronunciation(word)" title="再生">🔊</button>
+                </div>
+              </div>
+              <div class="col col-def">
+                <div v-if="word.definition" class="word-definition">{{ word.definition }}</div>
               </div>
             </div>
-            <div class="col col-def">
-              <div v-if="word.definition" class="word-definition">{{ word.definition }}</div>
+            <button
+              class="btn-delete"
+              @click="deleteWord(index)"
+              title="削除"
+            >
+              ✕
+            </button>
+          </div>
+          <!-- Affix Analysis Row - moved below the main word grid -->
+          <div v-if="selectedWordId === word.id" class="affix-analysis-row">
+            <div class="affix-analysis">
+              <div class="affix-header">
+                <span class="affix-icon">🔤</span>
+                <span class="affix-title">Word Structure</span>
+              </div>
+              <div v-if="getAnalysis(word.text)" class="affix-content">
+                <div class="breakdown">
+                  <strong>Breakdown:</strong> {{ getBreakdown(word.text) }}
+                </div>
+                <div class="components">
+                  <strong>Components:</strong> {{ getComponents(word.text) }}
+                </div>
+              </div>
+              <div v-else class="affix-none">
+                No affix pattern detected
+              </div>
             </div>
           </div>
-          <button
-            class="btn-delete"
-            @click="deleteWord(index)"
-            title="削除"
-          >
-            ✕
-          </button>
         </div>
       </div>
 
@@ -72,10 +94,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useWords } from './composables/useWords'
+import { useAffixAnalysis } from './composables/useAffixAnalysis'
 
 const { words, loading, error, deleteWord, fetchWords } = useWords()
+const { analyzeWord, formatAnalysis, getBreakdownVisualization } = useAffixAnalysis()
+
+// Affix analysis state
+const selectedWordId = ref<number | null>(null)
 
 /**
  * 再生: `audioUrl` があればそれを再生し、なければ SpeechSynthesis を使う
@@ -123,6 +150,38 @@ function formatTime(isoString: string): string {
   const hours = String(date.getHours()).padStart(2, '0')
   const minutes = String(date.getMinutes()).padStart(2, '0')
   return `${hours}:${minutes}`
+}
+
+// ===== AFFIX ANALYSIS FUNCTIONS =====
+
+/**
+ * Toggle affix analysis display for a word
+ */
+function toggleAffixAnalysis(wordId: number) {
+  selectedWordId.value = selectedWordId.value === wordId ? null : wordId
+}
+
+/**
+ * Get affix analysis for a word
+ */
+function getAnalysis(word: string) {
+  return analyzeWord(word)
+}
+
+/**
+ * Get breakdown visualization for a word
+ */
+function getBreakdown(word: string) {
+  const analysis = analyzeWord(word)
+  return analysis ? getBreakdownVisualization(analysis) : ''
+}
+
+/**
+ * Get formatted components for a word
+ */
+function getComponents(word: string) {
+  const analysis = analyzeWord(word)
+  return analysis ? formatAnalysis(analysis) : ''
 }
 
 /**
@@ -197,31 +256,24 @@ function testAddWord() {
 
 .word-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 12px 16px;
   background: #f8f9fa;
   border-radius: 6px;
   border-left: 3px solid #007bff;
   transition: background 0.2s;
+  position: relative;
 }
 
 .word-item:hover {
   background: #e9ecef;
 }
 
-.word-content {
-  flex: 1;
+.word-item-main {
   display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.word-text {
-  font-size: 16px;
-  font-weight: 500;
-  color: #212529;
-  word-break: break-all;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .word-time {
@@ -230,28 +282,10 @@ function testAddWord() {
   white-space: nowrap;
 }
 
-.word-main {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.word-meta {
-  margin-top: 6px;
-  display: flex;
-  flex-direction: column;
-}
-
 .word-pronunciation {
   font-size: 13px;
   color: #495057;
   margin-right: 8px;
-}
-
-.word-definition {
-  margin: 6px 0 0 0;
-  font-size: 13px;
-  color: #212529;
 }
 
 /* New layout: three columns */
@@ -260,6 +294,7 @@ function testAddWord() {
   align-items: flex-start;
   gap: 16px;
   width: 100%;
+  flex: 1;
 }
 .col {
   display: flex;
@@ -283,9 +318,130 @@ function testAddWord() {
   color: #212529;
   overflow-wrap: anywhere;
   word-break: normal;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
+
+.word-text:hover {
+  background: #f8f9fa;
+  color: #007bff;
+}
+
+/* ===== AFFIX ANALYSIS STYLES ===== */
+
+.affix-analysis-row {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.affix-analysis {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  border-left: 4px solid #007bff;
+  margin-left: 0;
+}
+
+.affix-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.affix-icon {
+  font-size: 1.2rem;
+}
+
+.affix-title {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.affix-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.breakdown, .components {
+  font-size: 0.875rem;
+  color: #495057;
+}
+
+.affix-none {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.analysis-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.breakdown-visual {
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  border: 2px solid #e9ecef;
+}
+
+.components-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.component-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 0.375rem;
+  border: 1px solid #dee2e6;
+}
+
+.component-type {
+  font-weight: 600;
+  color: #6f42c1;
+  min-width: 4rem;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.component-text {
+  font-weight: 500;
+  color: #333;
+  margin: 0 0.75rem;
+  font-family: 'Courier New', monospace;
+}
+
 .word-definition {
   white-space: normal;
+}
+
+.btn-play {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  padding: 0.2rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.btn-play:hover {
+  background: #f8f9fa;
 }
 
 .btn-delete {
@@ -298,6 +454,7 @@ function testAddWord() {
   cursor: pointer;
   font-size: 12px;
   transition: background 0.2s;
+  flex-shrink: 0;
 }
 
 .btn-delete:hover {
