@@ -5,8 +5,10 @@ const isProd = process.env.NODE_ENV === 'production'
 // Development: Use local backend if available, fallback to production
 const DEVELOPMENT_API_URL = process.env.DEV_API_URL || 'https://word-register-production.up.railway.app'
 
-// Production: Always use Railway backend
-const PRODUCTION_API_URL = 'https://word-register-production.up.railway.app'
+// Production: use same-origin relative path so Nuxt server middleware can proxy requests
+// This avoids CORS issues for preview domains and allows the server to forward
+// requests to the real backend. Keep development pointed at the remote backend.
+const PRODUCTION_API_URL = ''
 
 export const API_BASE_URL = isDevelopment ? DEVELOPMENT_API_URL : PRODUCTION_API_URL
 
