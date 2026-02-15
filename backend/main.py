@@ -69,9 +69,14 @@ if allowed:
     # カンマ区切りで渡す (例: https://app.vercel.app,http://localhost:3000)
     allow_origins = [a.strip() for a in allowed.split(",") if a.strip()]
 else:
+    # Default allowed origins include local dev and known frontend preview/production domains.
     allow_origins = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        # Nuxt production alias and recent preview domains used for deployments
+        "https://nuxt-app-liard-nu.vercel.app",
+        "https://nuxt-g8a6f8334-sshogos-projects.vercel.app",
+        "https://nuxt-ns7t8yi6f-sshogos-projects.vercel.app",
     ]
 
 app.add_middleware(
