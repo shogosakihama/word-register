@@ -34,15 +34,19 @@ export const useWordsStore = defineStore('words', () => {
       const response = await fetch(API_ENDPOINTS.words)
       if (!response.ok) throw new Error('Failed to fetch words')
       const data = await response.json()
-      words.value = data.words.map((w: any) => ({
-        id: w.id,
-        text: w.text,
-        pronunciation: w.pronunciation,
-        audioUrl: w.audioUrl,
-        definition: w.definition,
-        pageUrl: w.pageUrl,
-        createdAt: w.createdAt,
-      }))
+      console.log('[Store] Raw response:', data)
+      words.value = data.words.map((w: any) => {
+        console.log('[Store] Word data:', w.id, w.text, 'has ID:', !!w.id)
+        return {
+          id: w.id,
+          text: w.text,
+          pronunciation: w.pronunciation,
+          audioUrl: w.audioUrl,
+          definition: w.definition,
+          pageUrl: w.pageUrl,
+          createdAt: w.createdAt,
+        }
+      })
       console.log('[Store] Words fetched:', words.value.length)
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Unknown error'

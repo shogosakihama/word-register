@@ -33,17 +33,21 @@ export default defineNuxtPlugin(() => {
    * Background Service Worker が直接APIに保存するため、
    * Nuxt側はDBの最新状態をポーリングで取得する
    */
-  let lastWordCount = 0
+  let lastWordCount = wordsStore.words.length
   const pollInterval = setInterval(async () => {
     try {
       const response = await fetch(API_ENDPOINTS.words)
       if (!response.ok) return
       const data = await response.json()
       const newCount = data.total || 0
-      if (newCount !== lastWordCount) {
+      // 単語数が変わった場合のみ更新（削除直後のポーリングを防ぐため現在の配列長もチェック）
+      if (newCount !== lastWordCount && newCount !== wordsStore.words.length) {
         lastWordCount = newCount
         await wordsStore.fetchWords()
         console.log('[Plugin] Words updated via polling, count:', newCount)
+      } else {
+        // 単語数が一致している場合、lastWordCountを現在の値に更新
+        lastWordCount = wordsStore.words.length
       }
     } catch {
       // API接続失敗はサイレントに無視
