@@ -94,6 +94,7 @@ export const useWordsStore = defineStore('words', () => {
     
     const word = words.value[index]
     if (!word.id) {
+      console.warn('[Store] Word has no ID, removing from local state only')
       words.value.splice(index, 1)
       return
     }
@@ -101,12 +102,20 @@ export const useWordsStore = defineStore('words', () => {
     loading.value = true
     error.value = null
     try {
+      console.log('[Store] Deleting word:', word.id, word.text)
       const response = await fetch(`${API_ENDPOINTS.words}/${word.id}`, {
         method: 'DELETE',
       })
-      if (!response.ok) throw new Error('Failed to delete word')
+      console.log('[Store] Delete response status:', response.status)
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('[Store] Delete failed:', response.status, errorText)
+        throw new Error(`Failed to delete word: ${response.status}`)
+      }
+      
       words.value.splice(index, 1)
-      console.log('[Store] Word removed:', word)
+      console.log('[Store] Word removed successfully:', word)
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Unknown error'
       console.error('[Store] Delete error:', error.value)
