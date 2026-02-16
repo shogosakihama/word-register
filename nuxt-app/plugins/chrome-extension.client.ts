@@ -13,6 +13,7 @@ import { API_ENDPOINTS } from '../config/constants'
 declare global {
   interface Window {
     $testExtensionMessage?: () => void
+    $pausePolling?: (duration: number) => void
   }
 }
 
@@ -34,20 +35,35 @@ export default defineNuxtPlugin(() => {
    * Nuxt側はDBの最新状態をポーリングで取得する
    */
   let lastWordCount = wordsStore.words.length
+  let pollingPaused = false
+  
+  // Global function to pause polling temporarily (for delete operations)
+  window.$pausePolling = (duration: number) => {
+    pollingPaused = true
+    console.log(`[Plugin] Polling paused for ${duration}ms`)
+    setTimeout(() => {
+      pollingPaused = false
+      lastWordCount = wordsStore.words.length
+      console.log('[Plugin] Polling resumed')
+    }, duration)
+  }
+  
   const pollInterval = setInterval(async () => {
+    if (pollingPaused) {
+      console.log('[Plugin] Polling skipped (paused)')
+      return
+    }
+    
     try {
       const response = await fetch(API_ENDPOINTS.words)
       if (!response.ok) return
       const data = await response.json()
       const newCount = data.total || 0
-      // 単語数が変わった場合のみ更新（削除直後のポーリングを防ぐため現在の配列長もチェック）
-      if (newCount !== lastWordCount && newCount !== wordsStore.words.length) {
+      // 単語数が変わった場合のみ更新
+      if (newCount !== lastWordCount) {
         lastWordCount = newCount
         await wordsStore.fetchWords()
         console.log('[Plugin] Words updated via polling, count:', newCount)
-      } else {
-        // 単語数が一致している場合、lastWordCountを現在の値に更新
-        lastWordCount = wordsStore.words.length
       }
     } catch {
       // API接続失敗はサイレントに無視
