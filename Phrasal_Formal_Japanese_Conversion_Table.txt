@@ -1,0 +1,76 @@
+
+====================================================
+PHRASAL VERB ↔ FORMAL ENGLISH + JAPANESE TRANSLATION
+====================================================
+
+[Movement / Transition]
+get in        -> enter        -> 入る
+go out        -> exit         -> 出る
+come back     -> return       -> 戻る
+go through    -> undergo      -> 経験する／受ける
+get to        -> reach        -> 到達する
+move on       -> proceed      -> 進む
+
+[Execution / Action]
+carry out         -> execute        -> 実行する
+put into effect   -> implement      -> 実施する
+go ahead with     -> proceed with   -> 進める
+set about         -> commence       -> 着手する
+take on           -> undertake      -> 引き受ける
+
+[Investigation / Understanding]
+look into     -> investigate   -> 調査する
+find out      -> discover      -> 発見する
+figure out    -> determine     -> 判断する／解明する
+make out      -> discern       -> 見分ける
+take in       -> comprehend    -> 理解する
+
+[Construction / Start]
+set up        -> establish     -> 設立する
+put together  -> assemble      -> 組み立てる
+start off     -> commence      -> 開始する
+begin with    -> initiate      -> 開始する
+
+[Delay / Cancellation / Refusal]
+put off       -> postpone      -> 延期する
+call off      -> cancel        -> 中止する
+turn down     -> reject        -> 拒否する
+back out      -> withdraw      -> 撤退する
+hold off      -> defer         -> 延ばす
+
+[Management / Control]
+run           -> operate       -> 運営する
+take over     -> assume        -> 引き継ぐ
+deal with     -> handle        -> 対処する
+look after    -> manage        -> 管理する
+keep up       -> maintain      -> 維持する
+
+[Completion / Resolution]
+finish up     -> complete      -> 完了する
+carry through -> accomplish    -> 成し遂げる
+sort out      -> resolve       -> 解決する
+wrap up       -> conclude      -> 終了する
+get over      -> overcome      -> 克服する
+
+[Reduction / Removal]
+cut down      -> reduce        -> 削減する
+cut off       -> terminate     -> 終了させる／遮断する
+phase out     -> eliminate     -> 廃止する
+do away with  -> abolish       -> 廃止する
+
+[Increase / Support]
+bring about   -> cause         -> 引き起こす
+build up      -> accumulate    -> 蓄積する
+step up       -> enhance       -> 強化する
+back up       -> support       -> 支援する
+
+----------------------------------------------------
+USAGE GUIDE
+----------------------------------------------------
+- 句動詞：会話・カジュアル文章向き
+- フォーマル動詞：論文・報告書・契約向き
+- 日本語訳は文脈により変化する
+
+====================================================
+END OF TABLE
+====================================================

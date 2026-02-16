@@ -1,0 +1,65 @@
+---
+説明: FastAPI バックエンドに CORS 設定を追加するための差分と手順
+
+前提: バックエンドのエントリポイントが `main.py` にあり、リポジトリは手元のマシンでクローン済みであること。
+
+パッチ内容（`main.py` の `app = FastAPI()` の直後に挿入）：
+
+```py
+from fastapi.middleware.cors import CORSMiddleware
+
+# CORS設定: フロントのドメインを許可
+origins = [
+    "https://nuxt-app-liard-nu.vercel.app",        # 本番 alias
+    "https://nuxt-g8a6f8334-sshogos-projects.vercel.app",  # production サブドメイン（必要に応じて）
+    "https://nuxt-ns7t8yi6f-sshogos-projects.vercel.app",  # preview
+    "http://localhost:3000",   # 開発（必要なら）
+    "http://localhost:3001",   # 開発（必要なら）
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+安全簡易案:
+- 一時的に全オリジン許可で動作確認したい場合は `allow_origins=["*"]` に変更してください（ただし本番では推奨しません）。
+
+ブランチ作成〜PR手順（ローカルで実行）
+
+```bash
+# リポジトリルートで
+git checkout -b fix/cors-allow-frontends
+# main.py を編集して上記のコードを貼る
+# （エディタで貼り付けるか、以下の sed/awk を使って自動挿入する等）
+
+git add main.py
+git commit -m "fix(cors): allow frontend origins for Nuxt preview/production"
+git push -u origin fix/cors-allow-frontends
+
+# gh CLI を使って PR を作る（gh CLI が認証済みであること）
+gh pr create --fill --base main --head fix/cors-allow-frontends --title "fix(cors): allow frontend origins for Nuxt preview/production" --body "Add CORSMiddleware to allow Nuxt preview and production origins. See description in PR." 
+
+# gh が使えない場合は GitHub の UI から 'fix/cors-allow-frontends' ブランチで PR を作成してください。
+```
+
+ローカルでの簡易動作確認
+
+```bash
+# ローカルでバックエンドを起動
+uvicorn main:app --reload --port 8000
+
+# ブラウザ代わりに curl で Origin ヘッダ付けて確認
+curl -i -H "Origin: https://nuxt-app-liard-nu.vercel.app" http://localhost:8000/api/words
+```
+
+期待結果: レスポンスヘッダに `Access-Control-Allow-Origin: https://nuxt-app-liard-nu.vercel.app` が含まれている。
+
+補足: 私が直接 PR 作成を代行することもできます（GitHub 書き込み権限が必要）。もし代行希望なら、書き込み可能な GitHub トークン（または招待）を提供してください。
+
+---
+ファイルを確認のうえ、適用して PR を作成してください。必要なら私がコマンドをそのまま実行できるように代行もします（権限が必要）。
