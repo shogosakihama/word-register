@@ -30,50 +30,15 @@ export default defineNuxtPlugin(() => {
   const wordsStore = useWordsStore()
 
   /**
-   * 3秒ごとにAPIをポーリングしてUIを自動更新
-   * Background Service Worker が直接APIに保存するため、
-   * Nuxt側はDBの最新状態をポーリングで取得する
+   * ポーリング機能は一時的に無効化
+   * 削除機能の問題を解決するため
    */
-  let lastWordCount = wordsStore.words.length
-  let pollingPaused = false
+  console.log('[Plugin] Polling disabled for debugging')
   
-  // Global function to pause polling temporarily (for delete operations)
+  // Global function stub (for compatibility)
   window.$pausePolling = (duration: number) => {
-    pollingPaused = true
-    console.log(`[Plugin] Polling paused for ${duration}ms`)
-    setTimeout(() => {
-      pollingPaused = false
-      lastWordCount = wordsStore.words.length
-      console.log('[Plugin] Polling resumed')
-    }, duration)
+    console.log(`[Plugin] Polling pause requested but polling is disabled`)
   }
-  
-  const pollInterval = setInterval(async () => {
-    if (pollingPaused) {
-      console.log('[Plugin] Polling skipped (paused)')
-      return
-    }
-    
-    try {
-      const response = await fetch(API_ENDPOINTS.words)
-      if (!response.ok) return
-      const data = await response.json()
-      const newCount = data.total || 0
-      // 単語数が変わった場合のみ更新
-      if (newCount !== lastWordCount) {
-        lastWordCount = newCount
-        await wordsStore.fetchWords()
-        console.log('[Plugin] Words updated via polling, count:', newCount)
-      }
-    } catch {
-      // API接続失敗はサイレントに無視
-    }
-  }, 3000)
-
-  // ページ離脱時にポーリングを停止
-  window.addEventListener('beforeunload', () => {
-    clearInterval(pollInterval)
-  })
 
   // グローバル関数: Extension からのメッセージをテストする（開発用）
   if (process.dev) {
